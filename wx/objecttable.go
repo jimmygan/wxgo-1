@@ -154,22 +154,27 @@ func (t *objectTable) Release(ptr unsafe.Pointer, id uint16) {
 		if entry == nil {
 			return
 		}
+		entry.SetRef(entry.Ref() - 1)
+		if entry.Ref() == 0 {
+			delete(t.entries, ptr)
+			if entry.Held() {
+				del = entry.del
+			}
+		}
 		if DebugObjectBind {
 			var entryCopy = *entry
 			entryForDebug = &entryCopy
 		}
-		entry.SetRef(entry.Ref() - 1)
-		if entry.Held() && entry.Ref() == 0 {
-			delete(t.entries, ptr)
-			del = entry.del
-		}
 	}()
 	if DebugObjectBind {
-		released := ""
-		if del != nil {
-			released = " [Will delete]"
+		result := ""
+		if entryForDebug.Ref() == 0 {
+			result = " [Removed]"
+			if del != nil {
+				result = " [Deleted]"
+			}
 		}
-		log.Printf("[B] Release 0x%x  \t%s%v\n", ptr, entryForDebug, released)
+		log.Printf("[B] Release 0x%x  \t%s%v\n", ptr, entryForDebug, result)
 	}
 	if del != nil {
 		del(ptr)

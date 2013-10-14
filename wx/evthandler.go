@@ -112,6 +112,8 @@ func evtHandlerEventHubFunc(event Event) {
 	}
 	event.setEventUserData(entry.ud)
 	entry.f(event)
+	// The wxEvent object may be created on stack(ie. Menu event).
+	event.Release()
 	event.setEventUserData(nil)
 }
 

@@ -12,6 +12,7 @@ WxObjectPtr wxSizer_AddSizerWithUserData(WxObjectPtr p, WxObjectPtr sizer, int p
 WxObjectPtr wxSizer_AddNoStretchSpacer(WxObjectPtr p, int size);
 WxObjectPtr wxSizer_AddSpacerWithUserData(WxObjectPtr p, int width, int height, int proportion, int flag, int border, WxObjectPtr userData);
 WxObjectPtr wxSizer_AddStretchSpacer(WxObjectPtr p, int proportion);
+WxObjectPtr wxSizer_AddSizerItem(WxObjectPtr p, WxObjectPtr item);
 
 #ifdef __cplusplus
 }

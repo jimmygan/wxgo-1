@@ -232,12 +232,12 @@ func (w *window) SetSizeFlag(x, y, width, height, sizeFlags int) {
 	C.wxWindow_SetSizeFlag(p, C.int(x), C.int(y), C.int(width), C.int(height), C.int(sizeFlags))
 }
 
-func (w *window) SetSize(size Size) {
+func (w *window) SetSize(size *Size) {
 	p := wxPtr(w)
 	if p == nil {
 		return
 	}
-	C.wxWindow_SetSize(p, C.Size(size))
+	C.wxWindow_SetSize(p, (*C.Size)(size))
 }
 
 func (w *window) Close() bool {
@@ -289,17 +289,17 @@ func (w *window) Show(show bool) {
 }
 
 func (w *window) PopupMenu(menu Menu) bool {
-	return w.PopupMenuAtPos(menu, DefaultPosition)
+	return w.PopupMenuAtPos(menu, nil)
 }
 
-func (w *window) PopupMenuAtPos(menu Menu, pos Point) bool {
+func (w *window) PopupMenuAtPos(menu Menu, pos *Point) bool {
 	p := wxPtr(w)
 	if p == nil {
 		return false
 	}
 	// Doc: The menu does not get deleted by the window.
 	// Do not unhold menu.
-	return goBool(C.wxWindow_PopupMenu(p, wxPtr(menu), C.Point(pos)))
+	return goBool(C.wxWindow_PopupMenu(p, wxPtr(menu), (*C.Point)(pos)))
 }
 
 func (w *window) Sizer() Sizer {
@@ -359,10 +359,10 @@ type Window interface {
 	IsDescendant(win Window) bool
 	Reparent(newParent Window) bool
 	SetSizeFlag(x, y, width, height, sizeFlags int)
-	SetSize(Size)
+	SetSize(*Size)
 	Size() Size
 	Show(show bool)
-	PopupMenuAtPos(menu Menu, pos Point) bool
+	PopupMenuAtPos(menu Menu, pos *Point) bool
 	PopupMenu(menu Menu) bool
 	Close() bool
 	ForceClose() bool
@@ -374,11 +374,11 @@ type Window interface {
 }
 
 func NewWindow(parent Window, id int) Window {
-	return NewWindow2(parent, id, DefaultPosition, DefaultSize, 0, PanelNameStr)
+	return NewWindow2(parent, id, nil, nil, 0, PanelNameStr)
 }
 
-func NewWindow2(parent Window, id int, pos Point, size Size, style uint, name string) Window {
+func NewWindow2(parent Window, id int, pos *Point, size *Size, style uint, name string) Window {
 	w := &window{}
-	w.bindWxPtr(C.wxWindow_New(wxPtr(parent), C.int(id), C.Point(pos), C.Size(size), C.long(style), cString(&name)), true)
+	w.bindWxPtr(C.wxWindow_New(wxPtr(parent), C.int(id), (*C.Point)(pos), (*C.Size)(size), C.long(style), cString(&name)), true)
 	return w
 }

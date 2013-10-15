@@ -104,6 +104,14 @@ func (s *sizer) AddStretchSpace(proportion int) SizerItem {
 	return nil
 }
 
+func (s *sizer) AddSizerItem(item SizerItem) {
+	p := s.wxPtr()
+	if p == nil {
+		return
+	}
+	C.wxSizer_AddSizerItem(p, item.wxPtr())
+}
+
 type Sizer interface {
 	Object
 	AddWindow(win Window, flags *SizerFlags) SizerItem

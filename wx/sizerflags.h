@@ -4,10 +4,9 @@ extern "C" {
 
 #include "cgoutil.h"
 
-#define SIZERFLAGS_SIZE 12 // bytes
 
-typedef struct tagSizerFlags {
-	char _[SIZERFLAGS_SIZE];
+typedef struct {
+	int _[3];
 } SizerFlags;
 
 

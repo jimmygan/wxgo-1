@@ -24,3 +24,6 @@ WxObjectPtr wxSizer_AddSpacerWithUserData(WxObjectPtr p, int width, int height, 
 WxObjectPtr wxSizer_AddStretchSpacer(WxObjectPtr p, int proportion) {
 	return __PTR->AddStretchSpacer(proportion);
 }
+WxObjectPtr wxSizer_AddSizerItem(WxObjectPtr p, WxObjectPtr item) {
+	return __PTR->Add((wxSizerItem*)item);
+}

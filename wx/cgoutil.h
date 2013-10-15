@@ -17,17 +17,6 @@ typedef int BOOL;
 #define TRUE 1
 #define FALSE 0
 
-typedef struct tagPoint {
-	int X, Y;
-} Point;
-
-typedef struct tagSize {
-	int Width, Height;
-} Size;
-
-typedef struct tagRect {
-	int X, Y, Width, Height;
-} Rect;
 
 extern BOOL g_CgoReady;
 

@@ -3,8 +3,9 @@ extern "C" {
 #endif
 
 #include "cgoutil.h"
+#include "gdidim.h"
 
-WxObjectPtr	wxWindow_New(WxObjectPtr parent, int id, Point pos, Size size, long style, String name);
+WxObjectPtr	wxWindow_New(WxObjectPtr parent, int id, Point* pos, Size* size, long style, String name);
 void		wxWindow_SetSizeFlag(WxObjectPtr p, int x, int y, int width, int height, int sizeFlags);
 void		wxWindow_Show(WxObjectPtr p, BOOL show);
 BOOL		wxWindow_AcceptsFocus(WxObjectPtr p);
@@ -34,9 +35,9 @@ BOOL		wxWindow_IsDescendant(WxObjectPtr p,WxObjectPtr win);
 BOOL		wxWindow_Reparent(WxObjectPtr p, WxObjectPtr newParent);
 
 Size		wxWindow_GetSize(WxObjectPtr p);
-void		wxWindow_SetSize(WxObjectPtr p, Size size);
+void		wxWindow_SetSize(WxObjectPtr p, Size* size);
 
-BOOL		wxWindow_PopupMenu(WxObjectPtr p, WxObjectPtr menu, Point pos);
+BOOL		wxWindow_PopupMenu(WxObjectPtr p, WxObjectPtr menu, Point* pos);
 
 BOOL		wxWindow_Close(WxObjectPtr p, BOOL force);
 void		wxWindow_Destroy(WxObjectPtr p);

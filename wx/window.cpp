@@ -4,8 +4,8 @@
 
 #define __PTR ((wxWindow*)(p))
 
-WxObjectPtr wxWindow_New(WxObjectPtr parent, int id, Point pos, Size size, long style, String name) {
-	return new wxWindow((wxWindow*)parent, id, ToWxPoint(pos), ToWxSize(size), style, NewWxString(name));
+WxObjectPtr wxWindow_New(WxObjectPtr parent, int id, Point* pos, Size* size, long style, String name) {
+	return new wxWindow((wxWindow*)parent, id, pos ? *((wxPoint*)pos) : wxDefaultPosition, size ? *((wxSize*)size) : wxDefaultSize, style, NewWxString(name));
 }
 
 void wxWindow_SetSizeFlag(WxObjectPtr p, int x, int y, int width, int height, int sizeFlags) {
@@ -87,13 +87,14 @@ BOOL	wxWindow_Reparent(WxObjectPtr p, WxObjectPtr newParent) {
 	return __PTR->Reparent((wxWindow*)newParent);
 }
 Size		wxWindow_GetSize(WxObjectPtr p) {
-	return ToSize(__PTR->GetSize());
+	wxSize size = __PTR->GetSize();
+	return *((Size*)&size);
 }
-void		wxWindow_SetSize(WxObjectPtr p, Size size) {
-	__PTR->SetSize(ToWxSize(size));
+void		wxWindow_SetSize(WxObjectPtr p, Size* size) {
+	__PTR->SetSize(*((wxSize*)size));
 }
-BOOL		wxWindow_PopupMenu(WxObjectPtr p, WxObjectPtr menu, Point pos) {
-	return __PTR->PopupMenu((wxMenu*)menu, ToWxPoint(pos));
+BOOL		wxWindow_PopupMenu(WxObjectPtr p, WxObjectPtr menu, Point* pos) {
+	return __PTR->PopupMenu((wxMenu*)menu, pos ? *((wxPoint*)pos) : wxDefaultPosition);
 }
 BOOL		wxWindow_Close(WxObjectPtr p, BOOL force) {
 	return __PTR->Close(force);

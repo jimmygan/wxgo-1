@@ -18,7 +18,7 @@ func init() {
 var PanicOnInvalidObject bool = true
 var DebugObjectBind = true
 
-var errInvalidObject = errors.New("Invalid object")
+var ErrInvalidObject = errors.New("Invalid object")
 
 type base struct {
 	p  unsafe.Pointer
@@ -28,7 +28,7 @@ type base struct {
 func (b *base) ptr() unsafe.Pointer {
 	if !b.IsValid() {
 		if PanicOnInvalidObject {
-			panic(errInvalidObject)
+			panic(ErrInvalidObject)
 		}
 		return nil
 	}

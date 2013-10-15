@@ -6,14 +6,17 @@ extern "C" {
 #include "cgoutil.h"
 }
 
-wxString NewWxString(StringHandle handle);
-StringHandle NewGoString(const wxString& str);
+// Check sizeof(A) equals sizeof(B) at compile time.
+#define COMPILE_CHECK_SIZE_EQUAL(A,B) char ___sizeof_##A_does_not_equal_to_sizeof_##B___[1/(sizeof(A)==sizeof(B))]
 
-wxSize toWxSize(const Size& size);
+wxString NewWxString(String handle);
+String NewGoString(const wxString& str);
+
+wxSize ToWxSize(const Size& size);
 wxPoint ToWxPoint(const Point& point);
-Size toSize(const wxSize& size);
-Point toPoint(const wxPoint& point);
-wxRect toWxRect(const Rect& rect);
-Rect toRect(const wxRect& rect);
+Size ToSize(const wxSize& size);
+Point ToPoint(const wxPoint& point);
+wxRect ToWxRect(const Rect& rect);
+Rect ToRect(const wxRect& rect);
 
 

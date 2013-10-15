@@ -18,7 +18,7 @@ type app struct {
 
 func (a *app) bindWxPtr(p C.WxObjectPtr, hold bool) {
 	a.evtHandler.bindWxPtr(p, hold)
-	a.Bind(appRunInUIThreadEventHandler, "[App.RunInUI Event Handler]", evt_RUN_IN_UI, ID_ANY, ID_ANY, nil)
+	a.Bind(appRunInUIThreadEventHandler, "[App.RunInUI Event Handler]", evt_RUN_IN_UI)
 }
 
 func (a *app) SetTopWindow(w Window) {
@@ -38,10 +38,10 @@ func (a *app) ExitMainLoop() {
 	C.wxApp_ExitMainLoop(p)
 }
 
-const evt_RUN_IN_UI = EVT_USER_FIRST + 0x0FFFFFFF
+var evt_RUN_IN_UI = EVT_USER_FIRST + 0x0FFFFFFF
 
 func appRunInUIThreadEventHandler(event Event) {
-	payload := (*runInUIPayload)(event.(ThreadEvent).GetPayload())
+	payload := (*runInUIPayload)(event.(ThreadEvent).Payload())
 	payload.r <- payload.f()
 }
 

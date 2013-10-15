@@ -12,7 +12,7 @@ void wxObject_Delete(WxObjectPtr p) {
 }
 
 // Get the class name of a wxObject*.
-StringHandle wxObject_GetClassName(WxObjectPtr p) {
+String wxObject_GetClassName(WxObjectPtr p) {
 	const wxClassInfo* info = ((wxObject*)p)->GetClassInfo();
 	if(info == NULL) {
 		return NewGoString("");
@@ -20,14 +20,14 @@ StringHandle wxObject_GetClassName(WxObjectPtr p) {
 	return NewGoString(wxString(info->GetClassName()));
 }
 
-StringHandle wxObject_GetBaseClassName1(StringHandle className){
+String wxObject_GetBaseClassName1(String className){
 	wxClassInfo* base = wxClassInfo::FindClass(NewWxString(className));
 	if(!base) {
 		return NULL;
 	}
 	return NewGoString(base->GetBaseClassName1());
 }
-StringHandle wxObject_GetBaseClassName2(StringHandle className) {
+String wxObject_GetBaseClassName2(String className) {
 	wxClassInfo* base = wxClassInfo::FindClass(NewWxString(className));
 	if(!base) {
 		return NULL;

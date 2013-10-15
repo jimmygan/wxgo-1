@@ -15,7 +15,7 @@ type variant struct {
 	object
 }
 
-func (v *variant) GetInt64() int64 {
+func (v *variant) Int64() int64 {
 	p := wxPtr(v)
 	if p == nil {
 		return 0
@@ -23,7 +23,7 @@ func (v *variant) GetInt64() int64 {
 	return int64(C.wxVariant_GetInt64(p))
 }
 
-func (v *variant) GetIntString() string {
+func (v *variant) String() string {
 	p := wxPtr(v)
 	if p == nil {
 		return ""
@@ -33,8 +33,8 @@ func (v *variant) GetIntString() string {
 
 type Variant interface {
 	Object
-	GetInt64() int64
-	GetIntString() string
+	Int64() int64
+	String() string
 }
 
 func NewVariantInt64(n int64) Variant {

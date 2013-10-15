@@ -2,7 +2,6 @@ package wx
 
 import (
 	"reflect"
-	"unsafe"
 )
 
 //#include "object.h"
@@ -53,8 +52,12 @@ func findWxTypeFromTypeMap(className string) reflect.Type {
 	return nil
 }
 
-func wxPtrTypeName(wxPtr unsafe.Pointer) string {
-	t := findWxTypeFromTypeMap(goString(C.wxObject_GetClassName(C.WxObjectPtr(wxPtr))))
+func wxGetClassName(wxPtr C.WxObjectPtr) string {
+	return goString(C.wxObject_GetClassName(wxPtr))
+}
+
+func wxPtrTypeName(wxPtr C.WxObjectPtr) string {
+	t := findWxTypeFromTypeMap(goString(C.wxObject_GetClassName(wxPtr)))
 	if t != nil {
 		return t.String()
 	}

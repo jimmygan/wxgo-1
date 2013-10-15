@@ -7,7 +7,7 @@
 WxObjectPtr	wxMenuBar_New(long style) {
 	return new wxMenuBar(style);
 }
-void 		wxMenuBar_Append(WxObjectPtr p, WxObjectPtr menu, StringHandle title) {
+void 		wxMenuBar_Append(WxObjectPtr p, WxObjectPtr menu, String title) {
 	__PTR->Append((wxMenu*)menu, NewWxString(title));
 }
 WxObjectPtr	wxMenuBar_Remove(WxObjectPtr p, long pos) {

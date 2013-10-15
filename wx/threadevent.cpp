@@ -25,7 +25,7 @@ long	wxThreadEvent_GetExtraLong(WxObjectPtr p) {
 int		wxThreadEvent_GetInt(WxObjectPtr p) {
 	return __PTR->GetInt();
 }
-StringHandle	wxThreadEvent_GetString(WxObjectPtr p) {
+String	wxThreadEvent_GetString(WxObjectPtr p) {
 	return NewGoString(__PTR->GetString());
 }
 void	wxThreadEvent_SetExtraLong(WxObjectPtr p, long l) {
@@ -34,6 +34,6 @@ void	wxThreadEvent_SetExtraLong(WxObjectPtr p, long l) {
 void	wxThreadEvent_SetInt(WxObjectPtr p, int n) {
 	__PTR->SetInt(n);
 }
-void 	wxThreadEvent_SetString(WxObjectPtr p, StringHandle str) {
+void 	wxThreadEvent_SetString(WxObjectPtr p, String str) {
 	__PTR->SetString(NewWxString(str));
 }

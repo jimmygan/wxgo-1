@@ -5,7 +5,7 @@
 
 #define __PTR ((wxFrame*)(p))
 
-WxObjectPtr wxFrame_New(WxObjectPtr parent, int id, StringHandle title) {
+WxObjectPtr wxFrame_New(WxObjectPtr parent, int id, String title) {
 	return new wxFrame((wxWindow*)parent, id, NewWxString(title));
 }
 void wxFrame_Center(WxObjectPtr p) {

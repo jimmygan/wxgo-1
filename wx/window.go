@@ -144,7 +144,7 @@ func (w *window) FindWindowByName(name string) Window {
 	return nil
 }
 
-func (w *window) GetChildrenCount() int {
+func (w *window) ChildrenCount() int {
 	p := wxPtr(w)
 	if p == nil {
 		return 0
@@ -153,7 +153,7 @@ func (w *window) GetChildrenCount() int {
 }
 
 //BUG: Check the index in range.
-func (w *window) GetChild(index int) Window {
+func (w *window) Child(index int) Window {
 	p := wxPtr(w)
 	if p == nil {
 		return nil
@@ -164,17 +164,7 @@ func (w *window) GetChild(index int) Window {
 	return nil
 }
 
-//BUG: If the child is really a child of w, we need to hold it again.
-//Notice that this function is mostly internal to wxWidgets and shouldn't be called by the user code
-//func (w *window) RemoveChild(child Window) {
-//	p := wxPtr(w)
-//	if p == nil {
-//		return
-//	}
-//	C.wxWindow_RemoveChild(p, pChild)
-//}
-
-func (w *window) GetGrandParent() Window {
+func (w *window) GrandParent() Window {
 	p := wxPtr(w)
 	if p == nil {
 		return nil
@@ -185,7 +175,7 @@ func (w *window) GetGrandParent() Window {
 	return nil
 }
 
-func (w *window) GetNextSibling() Window {
+func (w *window) NextSibling() Window {
 	p := wxPtr(w)
 	if p == nil {
 		return nil
@@ -196,7 +186,7 @@ func (w *window) GetNextSibling() Window {
 	return nil
 }
 
-func (w *window) GetParent() Window {
+func (w *window) Parent() Window {
 	p := wxPtr(w)
 	if p == nil {
 		return nil
@@ -207,7 +197,7 @@ func (w *window) GetParent() Window {
 	return nil
 }
 
-func (w *window) GetPrevSibling() Window {
+func (w *window) PrevSibling() Window {
 	p := wxPtr(w)
 	if p == nil {
 		return nil
@@ -250,7 +240,39 @@ func (w *window) SetSize(size Size) {
 	C.wxWindow_SetSize(p, C.Size(size))
 }
 
-func (w *window) GetSize() Size {
+func (w *window) Close() bool {
+	p := wxPtr(w)
+	if p == nil {
+		return false
+	}
+	return goBool(C.wxWindow_Close(p, 0))
+}
+
+func (w *window) ForceClose() bool {
+	p := wxPtr(w)
+	if p == nil {
+		return false
+	}
+	return goBool(C.wxWindow_Close(p, 1))
+}
+
+func (w *window) Destroy() {
+	p := wxPtr(w)
+	if p == nil {
+		return
+	}
+	C.wxWindow_Destroy(p)
+}
+
+func (w *window) IsBeingDeleted() bool {
+	p := wxPtr(w)
+	if p == nil {
+		return false
+	}
+	return goBool(C.wxWindow_IsBeingDeleted(p))
+}
+
+func (w *window) Size() Size {
 	p := wxPtr(w)
 	if p == nil {
 		return Size{}
@@ -280,6 +302,37 @@ func (w *window) PopupMenuAtPos(menu Menu, pos Point) bool {
 	return goBool(C.wxWindow_PopupMenu(p, wxPtr(menu), C.Point(pos)))
 }
 
+func (w *window) Sizer() Sizer {
+	p := w.wxPtr()
+	if p == nil {
+		return nil
+	}
+	if s := NewObjectFromPtr(C.wxWindow_GetSizer(p), false); s != nil {
+		return s.(Sizer)
+	}
+	return nil
+}
+
+func (w *window) SetSizer(sizer Sizer) {
+	w.SetSizer2(sizer, true)
+}
+func (w *window) SetSizer2(sizer Sizer, deleteOld bool) {
+	p := wxPtr(w)
+	if p == nil {
+		return
+	}
+	// if deleteOld is false, we need to hold the old sizer, if any.
+	var oldSizer C.WxObjectPtr
+	if !deleteOld {
+		oldSizer = C.wxWindow_GetSizer(p) // Use C++ ptr directly.
+	}
+	sizer.unhold()
+	C.wxWindow_SetSizer(p, sizer.wxPtr(), cBool(deleteOld))
+	if oldSizer != nil {
+		NewObjectFromPtr(oldSizer, true) // Hold it.
+	}
+}
+
 type Window interface {
 	EvtHandler
 	AcceptsFocus() bool
@@ -296,21 +349,28 @@ type Window interface {
 	DestroyChildren() bool
 	FindWindow(id int) Window
 	FindWindowByName(name string) (win Window)
-	GetChildrenCount() int
-	GetChild(index int) Window
+	ChildrenCount() int
+	Child(index int) Window
 	//RemoveChild(child Window)
-	GetGrandParent() Window
-	GetNextSibling() Window
-	GetParent() Window
-	GetPrevSibling() Window
+	GrandParent() Window
+	NextSibling() Window
+	Parent() Window
+	PrevSibling() Window
 	IsDescendant(win Window) bool
 	Reparent(newParent Window) bool
 	SetSizeFlag(x, y, width, height, sizeFlags int)
 	SetSize(Size)
-	GetSize() Size
+	Size() Size
 	Show(show bool)
 	PopupMenuAtPos(menu Menu, pos Point) bool
 	PopupMenu(menu Menu) bool
+	Close() bool
+	ForceClose() bool
+	Destroy()
+	IsBeingDeleted() bool
+	Sizer() Sizer
+	SetSizer(sizer Sizer)
+	SetSizer2(sizer Sizer, deleteOld bool)
 }
 
 func NewWindow(parent Window, id int) Window {

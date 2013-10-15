@@ -17,15 +17,15 @@ func x_newGoString(p *C.char, n int) *string {
 	return &str
 }
 
-func goString(ptr C.StringHandle) string {
-	// The C.StringHandle is a *string.
+func goString(ptr C.String) string {
+	// The C.String is a *string.
 	return *(*string)(unsafe.Pointer(ptr))
 }
 
 //BUG: Is this safe from GC??
-func cString(str *string) C.StringHandle {
-	// The C.StringHandle is a *string.
-	return C.StringHandle(str)
+func cString(str *string) C.String {
+	// The C.String is a *string.
+	return C.String(str)
 }
 
 func cBool(b bool) C.BOOL {

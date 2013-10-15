@@ -9,6 +9,9 @@ import (
 	"unsafe"
 )
 
+//#include "object.h"
+import "C"
+
 var globalObjectTable = NewObjectTable()
 
 type objectTableEntry struct {
@@ -59,14 +62,14 @@ func (entry *objectTableEntry) String() string {
 
 // The map key is object pointer.
 type objectTable struct {
-	nextSeq uint16
+	nextId  uint16
 	entries map[unsafe.Pointer]*objectTableEntry
 	l       sync.RWMutex
 }
 
 func NewObjectTable() *objectTable {
 	return &objectTable{
-		nextSeq: 1,
+		nextId:  1,
 		entries: make(map[unsafe.Pointer]*objectTableEntry),
 	}
 }
@@ -97,12 +100,12 @@ func (t *objectTable) IsValid(ptr unsafe.Pointer, id uint16) bool {
 	return t.lookup(ptr, id) != nil
 }
 
-func (t *objectTable) NextSeq() (id uint16) {
-	id = t.nextSeq
+func (t *objectTable) NextId() (id uint16) {
+	id = t.nextId
 	if id == 0xFFFF {
-		t.nextSeq = 1
+		t.nextId = 1
 	} else {
-		t.nextSeq++
+		t.nextId++
 	}
 	return
 }
@@ -129,7 +132,7 @@ func (t *objectTable) Bind(ptr unsafe.Pointer, del func(unsafe.Pointer), hold bo
 			}
 			entry.SetRef(1)
 			entry.SetHeld(hold)
-			id = t.NextSeq()
+			id = t.NextId()
 			entry.SetId(id)
 			t.entries[ptr] = entry
 			if DebugObjectBind {
@@ -139,7 +142,7 @@ func (t *objectTable) Bind(ptr unsafe.Pointer, del func(unsafe.Pointer), hold bo
 		}
 	}()
 	if entryForDebug != nil {
-		log.Printf("[B] Bind 0x%x(%v)  \t%s Want to hold: %v\n", ptr, wxPtrTypeName(ptr), entryForDebug, hold)
+		log.Printf("[B] Bind 0x%x(%v)  \t%s Want to hold: %v\n", ptr, wxPtrTypeName(C.WxObjectPtr(ptr)), entryForDebug, hold)
 	}
 	return
 }
@@ -199,7 +202,7 @@ func (t *objectTable) DumpToWriter(w io.Writer) {
 	defer t.l.RUnlock()
 
 	fmt.Fprintln(w, "+++++ Begin Object table +++++")
-	fmt.Fprintf(w, "  Next id: %v\n", t.nextSeq)
+	fmt.Fprintf(w, "  Next id: %v\n", t.nextId)
 	fmt.Fprintf(w, "  Entry count: %v\n", len(t.entries))
 	var i = 0
 	for ptr, entry := range t.entries {

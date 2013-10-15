@@ -16,15 +16,18 @@ type menuEvent struct {
 }
 
 //bug: !!!NOT_COMPLETE!!
-func (e *menuEvent) GetMenu() C.WxObjectPtr {
+func (e *menuEvent) Menu() Menu {
 	p := wxPtr(e)
 	if p == nil {
 		return nil
 	}
-	return C.wxMenuEvent_GetMenu(p)
+	if obj := NewObjectFromPtr(C.wxMenuEvent_GetMenu(p), false); obj != nil {
+		return obj.(Menu)
+	}
+	return nil
 }
 
-func (e *menuEvent) GetMenuId() int {
+func (e *menuEvent) MenuId() int {
 	p := wxPtr(e)
 	if p == nil {
 		return -1
@@ -42,8 +45,8 @@ func (e *menuEvent) IsPopup() bool {
 
 type MenuEvent interface {
 	Event
-	GetMenu() C.WxObjectPtr
-	GetMenuId() int
+	Menu() Menu
+	MenuId() int
 	IsPopup() bool
 }
 

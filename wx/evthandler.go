@@ -59,7 +59,7 @@ func (h *evtHandler) SafelyProcessEvent(event Event) {
 	C.wxEvtHandler_SafelyProcessEvent(p, wxPtr(event))
 }
 
-func (h *evtHandler) ProcessPendingEvents(event Event) {
+func (h *evtHandler) ProcessPendingEvents() {
 	p := wxPtr(h)
 	if p == nil {
 		return
@@ -105,21 +105,21 @@ var nextEvtHandlerSeq int64
 func evtHandlerEventHubFunc(event Event) {
 	v := &variant{}
 	v.bindWxPtr(C.wxEvent_GetEventUserData(wxPtr(event)), false)
-	seq := v.GetInt64()
+	seq := v.Int64()
+	v.Release()
 	entry := evtHandlerTable[seq]
 	if entry == nil {
 		return
 	}
-	event.setEventUserData(entry.ud)
+	event.setUserData(entry.ud)
 	entry.f(event)
 	// The wxEvent object may be created on stack(ie. Menu event).
 	event.Release()
-	event.setEventUserData(nil)
 }
 
 var evtHandlerEventHubFuncVar = EventFunc(evtHandlerEventHubFunc)
 
-func (h *evtHandler) Bind(f EventFunc, funcTag string, eventType EventType, id int, lastId int, userData interface{}) {
+func (h *evtHandler) Bind3(f EventFunc, funcTag string, eventType EventType, id int, lastId int, userData interface{}) {
 	seq := nextEvtHandlerSeq
 	nextEvtHandlerSeq++
 	v := NewVariantInt64(seq)
@@ -135,7 +135,15 @@ func (h *evtHandler) Bind(f EventFunc, funcTag string, eventType EventType, id i
 	h.bind(&evtHandlerEventHubFuncVar, eventType, id, lastId, v)
 }
 
-func (h *evtHandler) Unbind(funcTag string, eventType EventType, id int, lastId int, userData interface{}) bool {
+func (h *evtHandler) Bind(f EventFunc, funcTag string, eventType EventType) {
+	h.Bind2(f, funcTag, eventType, ID_ANY)
+}
+
+func (h *evtHandler) Bind2(f EventFunc, funcTag string, eventType EventType, id int) {
+	h.Bind3(f, funcTag, eventType, id, ID_ANY, nil)
+}
+
+func (h *evtHandler) Unbind3(funcTag string, eventType EventType, id int, lastId int, userData interface{}) bool {
 	udIsFunc := reflect.TypeOf(userData).Kind() == reflect.Func
 	var v Variant
 	for _, entry := range evtHandlerTable {
@@ -152,10 +160,18 @@ func (h *evtHandler) Unbind(funcTag string, eventType EventType, id int, lastId 
 		return false
 	}
 	if h.unbind(&evtHandlerEventHubFuncVar, eventType, id, lastId, v) {
-		delete(evtHandlerTable, v.GetInt64())
+		delete(evtHandlerTable, v.Int64())
 		return true
 	}
 	return false
+}
+
+func (h *evtHandler) Unbind2(funcTag string, eventType EventType, id int) bool {
+	return h.Unbind3(funcTag, eventType, id, ID_ANY, nil)
+}
+
+func (h *evtHandler) Unbind(funcTag string, eventType EventType) bool {
+	return h.Unbind2(funcTag, eventType, ID_ANY)
 }
 
 func (h *evtHandler) bind(f *EventFunc, eventType EventType, id int, lastId int, userData Object) {
@@ -181,7 +197,7 @@ func (h *evtHandler) unbind(f *EventFunc, eventType EventType, id int, lastId in
 	return goBool(C.wxEvtHandler_Unbind(p, unsafe.Pointer(f), C.int(eventType), C.int(id), C.int(lastId), wxPtr(userData)))
 }
 
-func (h *evtHandler) GetEvtHandlerEnabled() bool {
+func (h *evtHandler) EvtHandlerEnabled() bool {
 	p := wxPtr(h)
 	if p == nil {
 		return false
@@ -189,7 +205,7 @@ func (h *evtHandler) GetEvtHandlerEnabled() bool {
 	return C.wxEvtHandler_GetEvtHandlerEnabled(p) != 0
 }
 
-func (h *evtHandler) GetNextHandler() EvtHandler {
+func (h *evtHandler) NextHandler() EvtHandler {
 	p := wxPtr(h)
 	if p == nil {
 		return nil
@@ -200,7 +216,7 @@ func (h *evtHandler) GetNextHandler() EvtHandler {
 	return nil
 }
 
-func (h *evtHandler) GetPreviousHandler() EvtHandler {
+func (h *evtHandler) PreviousHandler() EvtHandler {
 	p := wxPtr(h)
 	if p == nil {
 		return nil
@@ -254,13 +270,17 @@ type EvtHandler interface {
 	ProcessEvent(event Event)
 	ProcessEventLocall(event Event)
 	SafelyProcessEvent(event Event)
-	ProcessPendingEvents(event Event)
+	ProcessPendingEvents()
 	DeletePendingEvents()
-	Bind(f EventFunc, funTag string, eventType EventType, id int, lastId int, userData interface{})
-	Unbind(funTag string, eventType EventType, id int, lastId int, userData interface{}) bool
-	GetEvtHandlerEnabled() bool
-	GetNextHandler() EvtHandler
-	GetPreviousHandler() EvtHandler
+	Bind3(f EventFunc, funTag string, eventType EventType, id int, lastId int, userData interface{})
+	Bind2(f EventFunc, funcTag string, eventType EventType, id int)
+	Bind(f EventFunc, funcTag string, eventType EventType)
+	Unbind3(funTag string, eventType EventType, id int, lastId int, userData interface{}) bool
+	Unbind2(funTag string, eventType EventType, id int) bool
+	Unbind(funTag string, eventType EventType) bool
+	EvtHandlerEnabled() bool
+	NextHandler() EvtHandler
+	PreviousHandler() EvtHandler
 	SetEvtHandlerEnabled(enabled bool)
 	SetNextHandler(next EvtHandler)
 	SetPrevioustHandler(prev EvtHandler)

@@ -5,35 +5,18 @@ import (
 )
 
 //#include "event.h"
-//#include "defs.h"
 import "C"
 
 func init() {
 	mapType("wxEvent", reflect.TypeOf(event{}))
 }
 
-type EventCategory int
-
-type EventType int
-
-const (
-	EVT_ANY        EventType = C.wxID_ANY
-	EVT_FIRST      EventType = 10000
-	EVT_USER_FIRST EventType = EVT_FIRST + 2000
-	EVT_NULL       EventType = 0
-)
-
-var (
-	EVT_MENU   EventType = EventType(C.Get_wxEVT_MENU())
-	EVT_THREAD           = C.Get_wxEVT_THREAD()
-)
-
 type event struct {
 	object
 	userData interface{}
 }
 
-func (e *event) GetEventObject() Object {
+func (e *event) EventObject() Object {
 	p := wxPtr(e)
 	if p == nil {
 		return nil
@@ -41,7 +24,7 @@ func (e *event) GetEventObject() Object {
 	return NewObjectFromPtr(C.wxEvent_GetEventObject(p), false)
 }
 
-func (e *event) GetEventType() EventType {
+func (e *event) EventType() EventType {
 	p := wxPtr(e)
 	if p == nil {
 		return EventType(-1)
@@ -49,7 +32,7 @@ func (e *event) GetEventType() EventType {
 	return EventType(C.wxEvent_GetEventType(p))
 }
 
-func (e *event) GetEventCategory() EventCategory {
+func (e *event) EventCategory() EventCategory {
 	p := wxPtr(e)
 	if p == nil {
 		return EventCategory(-1)
@@ -57,7 +40,7 @@ func (e *event) GetEventCategory() EventCategory {
 	return EventCategory(C.wxEvent_GetEventCategory(p))
 }
 
-func (e *event) GetId() int {
+func (e *event) Id() int {
 	p := wxPtr(e)
 	if p == nil {
 		return -1
@@ -65,15 +48,15 @@ func (e *event) GetId() int {
 	return int(C.wxEvent_GetId(p))
 }
 
-func (e *event) GetEventUserData() interface{} {
+func (e *event) UserData() interface{} {
 	return e.userData
 }
 
-func (e *event) setEventUserData(ud interface{}) {
+func (e *event) setUserData(ud interface{}) {
 	e.userData = ud
 }
 
-func (e *event) wxGetEventUserData() Object {
+func (e *event) wxUserData() Object {
 	p := wxPtr(e)
 	if p == nil {
 		return nil
@@ -81,7 +64,7 @@ func (e *event) wxGetEventUserData() Object {
 	return NewObjectFromPtr(C.wxEvent_GetEventUserData(p), false)
 }
 
-func (e *event) GetSkipped() bool {
+func (e *event) Skipped() bool {
 	p := wxPtr(e)
 	if p == nil {
 		return false
@@ -89,7 +72,7 @@ func (e *event) GetSkipped() bool {
 	return C.wxEvent_GetSkipped(p) != 0
 }
 
-func (e *event) GetTimestamp() int64 {
+func (e *event) Timestamp() int64 {
 	p := wxPtr(e)
 	if p == nil {
 		return 0
@@ -172,13 +155,13 @@ func (e *event) StopPropagation() {
 
 type Event interface {
 	Object
-	GetEventObject() Object
-	GetEventType() EventType
-	GetEventCategory() EventCategory
-	GetId() int
-	GetEventUserData() interface{}
-	GetSkipped() bool
-	GetTimestamp() int64
+	EventObject() Object
+	EventType() EventType
+	EventCategory() EventCategory
+	Id() int
+	UserData() interface{}
+	Skipped() bool
+	Timestamp() int64
 	IsCommandEvent() bool
 	ResumePropagation(propagationLevel int)
 	SetEventObject(obj Object)
@@ -188,6 +171,6 @@ type Event interface {
 	ShouldPropagate() bool
 	Skip(skip bool)
 	StopPropagation()
-	wxGetEventUserData() Object
-	setEventUserData(ud interface{})
+	wxUserData() Object
+	setUserData(ud interface{})
 }

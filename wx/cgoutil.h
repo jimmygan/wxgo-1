@@ -11,7 +11,7 @@ extern "C" {
 // We only need to modify "cgoutil.cpp" and "cgoutil.go" in order to change the
 // internal details of string exchanging, if we use this opaque handle to
 // exchange string data.
-typedef void* StringHandle;
+typedef void* String;
 typedef void* WxObjectPtr;
 typedef int BOOL;
 #define TRUE 1

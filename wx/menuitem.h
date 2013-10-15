@@ -4,8 +4,8 @@ extern "C" {
 
 #include "cgoutil.h"
 
-WxObjectPtr		wxMenuItem_New(WxObjectPtr parentMenu, int id, StringHandle text, StringHandle helpString, int kind, WxObjectPtr subMenu);
-StringHandle	wxMenuItem_GetItemLabelText(WxObjectPtr p);
+WxObjectPtr		wxMenuItem_New(WxObjectPtr parentMenu, int id, String text, String helpString, int kind, WxObjectPtr subMenu);
+String	wxMenuItem_GetItemLabelText(WxObjectPtr p);
 
 #ifdef __cplusplus
 }

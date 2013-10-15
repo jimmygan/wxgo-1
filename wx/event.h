@@ -1,9 +1,9 @@
+#include <wx/defs.h>
 #include "cgoutil.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 WxObjectPtr wxEvent_GetEventObject(WxObjectPtr p);
 int wxEvent_GetEventType(WxObjectPtr p);

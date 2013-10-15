@@ -4,7 +4,7 @@ extern "C" {
 
 #include "cgoutil.h"
 
-WxObjectPtr wxFrame_New(WxObjectPtr parent, int id, StringHandle title);
+WxObjectPtr wxFrame_New(WxObjectPtr parent, int id, String title);
 void 		wxFrame_Center(WxObjectPtr p);
 
 void 		wxFrame_SetMenuBar(WxObjectPtr p, WxObjectPtr menubar);

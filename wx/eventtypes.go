@@ -1,0 +1,155 @@
+package wx
+
+//#include "eventtypes.h"
+import "C"
+
+type EventType int
+
+// These event types are C enums which are not "const" in go's point of view.
+var (
+	EVT_ANY                    EventType = EventType(C.Get_wxEVT_ANY())
+	EVT_NULL                   EventType = EventType(C.Get_wxEVT_NULL())
+	EVT_FIRST                  EventType = EventType(C.Get_wxEVT_FIRST())
+	EVT_USER_FIRST             EventType = EventType(C.Get_wxEVT_USER_FIRST())
+	EVT_BUTTON                 EventType = EventType(C.Get_wxEVT_BUTTON())
+	EVT_CHECKBOX               EventType = EventType(C.Get_wxEVT_CHECKBOX())
+	EVT_CHOICE                 EventType = EventType(C.Get_wxEVT_CHOICE())
+	EVT_LISTBOX                EventType = EventType(C.Get_wxEVT_LISTBOX())
+	EVT_LISTBOX_DCLICK         EventType = EventType(C.Get_wxEVT_LISTBOX_DCLICK())
+	EVT_CHECKLISTBOX           EventType = EventType(C.Get_wxEVT_CHECKLISTBOX())
+	EVT_MENU                   EventType = EventType(C.Get_wxEVT_MENU())
+	EVT_SLIDER                 EventType = EventType(C.Get_wxEVT_SLIDER())
+	EVT_RADIOBOX               EventType = EventType(C.Get_wxEVT_RADIOBOX())
+	EVT_RADIOBUTTON            EventType = EventType(C.Get_wxEVT_RADIOBUTTON())
+	EVT_SCROLLBAR              EventType = EventType(C.Get_wxEVT_SCROLLBAR())
+	EVT_VLBOX                  EventType = EventType(C.Get_wxEVT_VLBOX())
+	EVT_COMBOBOX               EventType = EventType(C.Get_wxEVT_COMBOBOX())
+	EVT_TOOL_RCLICKED          EventType = EventType(C.Get_wxEVT_TOOL_RCLICKED())
+	EVT_TOOL_DROPDOWN          EventType = EventType(C.Get_wxEVT_TOOL_DROPDOWN())
+	EVT_TOOL_ENTER             EventType = EventType(C.Get_wxEVT_TOOL_ENTER())
+	EVT_COMBOBOX_DROPDOWN      EventType = EventType(C.Get_wxEVT_COMBOBOX_DROPDOWN())
+	EVT_COMBOBOX_CLOSEUP       EventType = EventType(C.Get_wxEVT_COMBOBOX_CLOSEUP())
+	EVT_THREAD                 EventType = EventType(C.Get_wxEVT_THREAD())
+	EVT_ASYNC_METHOD_CALL      EventType = EventType(C.Get_wxEVT_ASYNC_METHOD_CALL())
+	EVT_LEFT_DOWN              EventType = EventType(C.Get_wxEVT_LEFT_DOWN())
+	EVT_LEFT_UP                EventType = EventType(C.Get_wxEVT_LEFT_UP())
+	EVT_MIDDLE_DOWN            EventType = EventType(C.Get_wxEVT_MIDDLE_DOWN())
+	EVT_MIDDLE_UP              EventType = EventType(C.Get_wxEVT_MIDDLE_UP())
+	EVT_RIGHT_DOWN             EventType = EventType(C.Get_wxEVT_RIGHT_DOWN())
+	EVT_RIGHT_UP               EventType = EventType(C.Get_wxEVT_RIGHT_UP())
+	EVT_MOTION                 EventType = EventType(C.Get_wxEVT_MOTION())
+	EVT_ENTER_WINDOW           EventType = EventType(C.Get_wxEVT_ENTER_WINDOW())
+	EVT_LEAVE_WINDOW           EventType = EventType(C.Get_wxEVT_LEAVE_WINDOW())
+	EVT_LEFT_DCLICK            EventType = EventType(C.Get_wxEVT_LEFT_DCLICK())
+	EVT_MIDDLE_DCLICK          EventType = EventType(C.Get_wxEVT_MIDDLE_DCLICK())
+	EVT_RIGHT_DCLICK           EventType = EventType(C.Get_wxEVT_RIGHT_DCLICK())
+	EVT_SET_FOCUS              EventType = EventType(C.Get_wxEVT_SET_FOCUS())
+	EVT_KILL_FOCUS             EventType = EventType(C.Get_wxEVT_KILL_FOCUS())
+	EVT_CHILD_FOCUS            EventType = EventType(C.Get_wxEVT_CHILD_FOCUS())
+	EVT_MOUSEWHEEL             EventType = EventType(C.Get_wxEVT_MOUSEWHEEL())
+	EVT_AUX1_DOWN              EventType = EventType(C.Get_wxEVT_AUX1_DOWN())
+	EVT_AUX1_UP                EventType = EventType(C.Get_wxEVT_AUX1_UP())
+	EVT_AUX1_DCLICK            EventType = EventType(C.Get_wxEVT_AUX1_DCLICK())
+	EVT_AUX2_DOWN              EventType = EventType(C.Get_wxEVT_AUX2_DOWN())
+	EVT_AUX2_UP                EventType = EventType(C.Get_wxEVT_AUX2_UP())
+	EVT_AUX2_DCLICK            EventType = EventType(C.Get_wxEVT_AUX2_DCLICK())
+	EVT_CHAR                   EventType = EventType(C.Get_wxEVT_CHAR())
+	EVT_CHAR_HOOK              EventType = EventType(C.Get_wxEVT_CHAR_HOOK())
+	EVT_NAVIGATION_KEY         EventType = EventType(C.Get_wxEVT_NAVIGATION_KEY())
+	EVT_KEY_DOWN               EventType = EventType(C.Get_wxEVT_KEY_DOWN())
+	EVT_KEY_UP                 EventType = EventType(C.Get_wxEVT_KEY_UP())
+	EVT_HOTKEY                 EventType = EventType(C.Get_wxEVT_HOTKEY())
+	EVT_AFTER_CHAR             EventType = EventType(C.Get_wxEVT_AFTER_CHAR())
+	EVT_SET_CURSOR             EventType = EventType(C.Get_wxEVT_SET_CURSOR())
+	EVT_SCROLL_TOP             EventType = EventType(C.Get_wxEVT_SCROLL_TOP())
+	EVT_SCROLL_BOTTOM          EventType = EventType(C.Get_wxEVT_SCROLL_BOTTOM())
+	EVT_SCROLL_LINEUP          EventType = EventType(C.Get_wxEVT_SCROLL_LINEUP())
+	EVT_SCROLL_LINEDOWN        EventType = EventType(C.Get_wxEVT_SCROLL_LINEDOWN())
+	EVT_SCROLL_PAGEUP          EventType = EventType(C.Get_wxEVT_SCROLL_PAGEUP())
+	EVT_SCROLL_PAGEDOWN        EventType = EventType(C.Get_wxEVT_SCROLL_PAGEDOWN())
+	EVT_SCROLL_THUMBTRACK      EventType = EventType(C.Get_wxEVT_SCROLL_THUMBTRACK())
+	EVT_SCROLL_THUMBRELEASE    EventType = EventType(C.Get_wxEVT_SCROLL_THUMBRELEASE())
+	EVT_SCROLL_CHANGED         EventType = EventType(C.Get_wxEVT_SCROLL_CHANGED())
+	EVT_SPIN_UP                EventType = EventType(C.Get_wxEVT_SPIN_UP())
+	EVT_SPIN_DOWN              EventType = EventType(C.Get_wxEVT_SPIN_DOWN())
+	EVT_SPIN                   EventType = EventType(C.Get_wxEVT_SPIN())
+	EVT_SCROLLWIN_TOP          EventType = EventType(C.Get_wxEVT_SCROLLWIN_TOP())
+	EVT_SCROLLWIN_BOTTOM       EventType = EventType(C.Get_wxEVT_SCROLLWIN_BOTTOM())
+	EVT_SCROLLWIN_LINEUP       EventType = EventType(C.Get_wxEVT_SCROLLWIN_LINEUP())
+	EVT_SCROLLWIN_LINEDOWN     EventType = EventType(C.Get_wxEVT_SCROLLWIN_LINEDOWN())
+	EVT_SCROLLWIN_PAGEUP       EventType = EventType(C.Get_wxEVT_SCROLLWIN_PAGEUP())
+	EVT_SCROLLWIN_PAGEDOWN     EventType = EventType(C.Get_wxEVT_SCROLLWIN_PAGEDOWN())
+	EVT_SCROLLWIN_THUMBTRACK   EventType = EventType(C.Get_wxEVT_SCROLLWIN_THUMBTRACK())
+	EVT_SCROLLWIN_THUMBRELEASE EventType = EventType(C.Get_wxEVT_SCROLLWIN_THUMBRELEASE())
+	EVT_SIZE                   EventType = EventType(C.Get_wxEVT_SIZE())
+	EVT_MOVE                   EventType = EventType(C.Get_wxEVT_MOVE())
+	EVT_CLOSE_WINDOW           EventType = EventType(C.Get_wxEVT_CLOSE_WINDOW())
+	EVT_END_SESSION            EventType = EventType(C.Get_wxEVT_END_SESSION())
+	EVT_QUERY_END_SESSION      EventType = EventType(C.Get_wxEVT_QUERY_END_SESSION())
+	EVT_ACTIVATE_APP           EventType = EventType(C.Get_wxEVT_ACTIVATE_APP())
+	EVT_ACTIVATE               EventType = EventType(C.Get_wxEVT_ACTIVATE())
+	EVT_CREATE                 EventType = EventType(C.Get_wxEVT_CREATE())
+	EVT_DESTROY                EventType = EventType(C.Get_wxEVT_DESTROY())
+	EVT_SHOW                   EventType = EventType(C.Get_wxEVT_SHOW())
+	EVT_ICONIZE                EventType = EventType(C.Get_wxEVT_ICONIZE())
+	EVT_MAXIMIZE               EventType = EventType(C.Get_wxEVT_MAXIMIZE())
+	EVT_MOUSE_CAPTURE_CHANGED  EventType = EventType(C.Get_wxEVT_MOUSE_CAPTURE_CHANGED())
+	EVT_MOUSE_CAPTURE_LOST     EventType = EventType(C.Get_wxEVT_MOUSE_CAPTURE_LOST())
+	EVT_PAINT                  EventType = EventType(C.Get_wxEVT_PAINT())
+	EVT_ERASE_BACKGROUND       EventType = EventType(C.Get_wxEVT_ERASE_BACKGROUND())
+	EVT_NC_PAINT               EventType = EventType(C.Get_wxEVT_NC_PAINT())
+	EVT_MENU_OPEN              EventType = EventType(C.Get_wxEVT_MENU_OPEN())
+	EVT_MENU_CLOSE             EventType = EventType(C.Get_wxEVT_MENU_CLOSE())
+	EVT_MENU_HIGHLIGHT         EventType = EventType(C.Get_wxEVT_MENU_HIGHLIGHT())
+	EVT_CONTEXT_MENU           EventType = EventType(C.Get_wxEVT_CONTEXT_MENU())
+	EVT_SYS_COLOUR_CHANGED     EventType = EventType(C.Get_wxEVT_SYS_COLOUR_CHANGED())
+	EVT_DISPLAY_CHANGED        EventType = EventType(C.Get_wxEVT_DISPLAY_CHANGED())
+	EVT_QUERY_NEW_PALETTE      EventType = EventType(C.Get_wxEVT_QUERY_NEW_PALETTE())
+	EVT_PALETTE_CHANGED        EventType = EventType(C.Get_wxEVT_PALETTE_CHANGED())
+	EVT_JOY_BUTTON_DOWN        EventType = EventType(C.Get_wxEVT_JOY_BUTTON_DOWN())
+	EVT_JOY_BUTTON_UP          EventType = EventType(C.Get_wxEVT_JOY_BUTTON_UP())
+	EVT_JOY_MOVE               EventType = EventType(C.Get_wxEVT_JOY_MOVE())
+	EVT_JOY_ZMOVE              EventType = EventType(C.Get_wxEVT_JOY_ZMOVE())
+	EVT_DROP_FILES             EventType = EventType(C.Get_wxEVT_DROP_FILES())
+	EVT_INIT_DIALOG            EventType = EventType(C.Get_wxEVT_INIT_DIALOG())
+	EVT_IDLE                   EventType = EventType(C.Get_wxEVT_IDLE())
+	EVT_UPDATE_UI              EventType = EventType(C.Get_wxEVT_UPDATE_UI())
+	EVT_SIZING                 EventType = EventType(C.Get_wxEVT_SIZING())
+	EVT_MOVING                 EventType = EventType(C.Get_wxEVT_MOVING())
+	EVT_MOVE_START             EventType = EventType(C.Get_wxEVT_MOVE_START())
+	EVT_MOVE_END               EventType = EventType(C.Get_wxEVT_MOVE_END())
+	EVT_HIBERNATE              EventType = EventType(C.Get_wxEVT_HIBERNATE())
+	EVT_TEXT_COPY              EventType = EventType(C.Get_wxEVT_TEXT_COPY())
+	EVT_TEXT_CUT               EventType = EventType(C.Get_wxEVT_TEXT_CUT())
+	EVT_TEXT_PASTE             EventType = EventType(C.Get_wxEVT_TEXT_PASTE())
+	EVT_COMMAND_LEFT_CLICK     EventType = EventType(C.Get_wxEVT_COMMAND_LEFT_CLICK())
+	EVT_COMMAND_LEFT_DCLICK    EventType = EventType(C.Get_wxEVT_COMMAND_LEFT_DCLICK())
+	EVT_COMMAND_RIGHT_CLICK    EventType = EventType(C.Get_wxEVT_COMMAND_RIGHT_CLICK())
+	EVT_COMMAND_RIGHT_DCLICK   EventType = EventType(C.Get_wxEVT_COMMAND_RIGHT_DCLICK())
+	EVT_COMMAND_SET_FOCUS      EventType = EventType(C.Get_wxEVT_COMMAND_SET_FOCUS())
+	EVT_COMMAND_KILL_FOCUS     EventType = EventType(C.Get_wxEVT_COMMAND_KILL_FOCUS())
+	EVT_COMMAND_ENTER          EventType = EventType(C.Get_wxEVT_COMMAND_ENTER())
+)
+
+type EventPropagation int
+
+const (
+	EVENT_PROPAGATE_NONE EventPropagation = 0
+	EVENT_PROPAGATE_MAX  EventPropagation = 0x7FFFFFFF
+)
+
+type EventCategory int
+
+const (
+	EVT_CATEGORY_UI            EventCategory = 1
+	EVT_CATEGORY_USER_INPUT    EventCategory = 2
+	EVT_CATEGORY_SOCKET        EventCategory = 4
+	EVT_CATEGORY_TIMER         EventCategory = 8
+	EVT_CATEGORY_THREAD        EventCategory = 16
+	EVT_CATEGORY_UNKNOWN       EventCategory = 32
+	EVT_CATEGORY_CLIPBOARD     EventCategory = 64
+	EVT_CATEGORY_NATIVE_EVENTS EventCategory = EVT_CATEGORY_UI | EVT_CATEGORY_USER_INPUT
+	EVT_CATEGORY_ALL           EventCategory = EVT_CATEGORY_UI | EVT_CATEGORY_USER_INPUT | EVT_CATEGORY_SOCKET |
+		EVT_CATEGORY_TIMER | EVT_CATEGORY_THREAD | EVT_CATEGORY_UNKNOWN |
+		EVT_CATEGORY_CLIPBOARD
+)

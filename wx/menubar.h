@@ -5,7 +5,7 @@ extern "C" {
 #include "cgoutil.h"
 
 WxObjectPtr	wxMenuBar_New(long style);
-void 		wxMenuBar_Append(WxObjectPtr p, WxObjectPtr menu, StringHandle title);
+void 		wxMenuBar_Append(WxObjectPtr p, WxObjectPtr menu, String title);
 WxObjectPtr	wxMenuBar_Remove(WxObjectPtr p, long pos);
 
 #ifdef __cplusplus

@@ -6,10 +6,10 @@ extern "C" {
 
 WxObjectPtr wxObject_New();
 void wxObject_Delete(WxObjectPtr);
-StringHandle wxObject_GetClassName(WxObjectPtr p);
+String wxObject_GetClassName(WxObjectPtr p);
 
-StringHandle wxObject_GetBaseClassName1(StringHandle className);
-StringHandle wxObject_GetBaseClassName2(StringHandle className);
+String wxObject_GetBaseClassName1(String className);
+String wxObject_GetBaseClassName2(String className);
 
 #ifdef __cplusplus
 }

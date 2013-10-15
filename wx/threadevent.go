@@ -16,7 +16,7 @@ type threadEvent struct {
 	event
 }
 
-func (e *threadEvent) GetEventCategory() EventCategory {
+func (e *threadEvent) EventCategory() EventCategory {
 	p := wxPtr(e)
 	if p == nil {
 		return 0
@@ -32,7 +32,7 @@ func (e *threadEvent) SetPayload(payload unsafe.Pointer) {
 	C.wxThreadEvent_SetPayload(p, payload)
 }
 
-func (e *threadEvent) GetPayload() unsafe.Pointer {
+func (e *threadEvent) Payload() unsafe.Pointer {
 	p := wxPtr(e)
 	if p == nil {
 		return nil
@@ -40,7 +40,7 @@ func (e *threadEvent) GetPayload() unsafe.Pointer {
 	return C.wxThreadEvent_GetPayload(p)
 }
 
-func (e *threadEvent) GetExtraLong() uint {
+func (e *threadEvent) ExtraLong() uint {
 	p := wxPtr(e)
 	if p == nil {
 		return 0
@@ -48,7 +48,7 @@ func (e *threadEvent) GetExtraLong() uint {
 	return uint(C.wxThreadEvent_GetExtraLong(p))
 }
 
-func (e *threadEvent) GetInt() int {
+func (e *threadEvent) Int() int {
 	p := wxPtr(e)
 	if p == nil {
 		return 0
@@ -56,7 +56,7 @@ func (e *threadEvent) GetInt() int {
 	return int(C.wxThreadEvent_GetInt(p))
 }
 
-func (e *threadEvent) GetString() string {
+func (e *threadEvent) String() string {
 	p := wxPtr(e)
 	if p == nil {
 		return ""
@@ -91,10 +91,10 @@ func (e *threadEvent) SetString(str string) {
 type ThreadEvent interface {
 	Event
 	SetPayload(payload unsafe.Pointer)
-	GetPayload() unsafe.Pointer
-	GetExtraLong() uint
-	GetInt() int
-	GetString() string
+	Payload() unsafe.Pointer
+	ExtraLong() uint
+	Int() int
+	String() string
 	SetLong(n uint)
 	SetInt(n int)
 	SetString(str string)

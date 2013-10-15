@@ -4,8 +4,8 @@
 
 #define __PTR ((wxWindow*)(p))
 
-WxObjectPtr wxWindow_New(WxObjectPtr parent, int id, Point pos, Size size, long style, StringHandle name) {
-	return new wxWindow((wxWindow*)parent, id, ToWxPoint(pos), toWxSize(size), style, NewWxString(name));
+WxObjectPtr wxWindow_New(WxObjectPtr parent, int id, Point pos, Size size, long style, String name) {
+	return new wxWindow((wxWindow*)parent, id, ToWxPoint(pos), ToWxSize(size), style, NewWxString(name));
 }
 
 void wxWindow_SetSizeFlag(WxObjectPtr p, int x, int y, int width, int height, int sizeFlags) {
@@ -54,7 +54,7 @@ BOOL	wxWindow_DestroyChildren(WxObjectPtr p) {
 WxObjectPtr	wxWindow_FindWindow(WxObjectPtr p, long id) {
 	return __PTR->FindWindow(id);
 }
-WxObjectPtr	wxWindow_FindWindowByName(WxObjectPtr p, StringHandle name) {
+WxObjectPtr	wxWindow_FindWindowByName(WxObjectPtr p, String name) {
 	return __PTR->FindWindow(NewWxString(name));
 }
 // GetChildren hack
@@ -87,11 +87,26 @@ BOOL	wxWindow_Reparent(WxObjectPtr p, WxObjectPtr newParent) {
 	return __PTR->Reparent((wxWindow*)newParent);
 }
 Size		wxWindow_GetSize(WxObjectPtr p) {
-	return toSize(__PTR->GetSize());
+	return ToSize(__PTR->GetSize());
 }
 void		wxWindow_SetSize(WxObjectPtr p, Size size) {
-	__PTR->SetSize(toWxSize(size));
+	__PTR->SetSize(ToWxSize(size));
 }
 BOOL		wxWindow_PopupMenu(WxObjectPtr p, WxObjectPtr menu, Point pos) {
 	return __PTR->PopupMenu((wxMenu*)menu, ToWxPoint(pos));
+}
+BOOL		wxWindow_Close(WxObjectPtr p, BOOL force) {
+	return __PTR->Close(force);
+}
+void		wxWindow_Destroy(WxObjectPtr p) {
+	__PTR->Destroy();
+}
+BOOL		wxWindow_IsBeingDeleted(WxObjectPtr p) {
+	return __PTR->IsBeingDeleted();
+}
+WxObjectPtr	wxWindow_GetSizer(WxObjectPtr p) {
+	return __PTR->GetSizer();
+}
+void		wxWindow_SetSizer(WxObjectPtr p, WxObjectPtr sizer, BOOL deleteOld) {
+	__PTR->SetSizer((wxSizer*)sizer, deleteOld);
 }

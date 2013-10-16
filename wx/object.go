@@ -67,6 +67,13 @@ func (b *base) Release() bool {
 	return true
 }
 
+func (b *base) hold() {
+	if !b.IsValid() {
+		return
+	}
+	globalObjectTable.Hold(b.p, b.id)
+}
+
 func (b *base) unhold() {
 	if !b.IsValid() {
 		return
@@ -84,6 +91,7 @@ type Base interface {
 
 	ptr() unsafe.Pointer
 	bindPtr(ptr unsafe.Pointer, del func(unsafe.Pointer), hold bool)
+	hold()
 	unhold()
 	can_not_implement_this_interface(out_side_of_package_wx)
 }

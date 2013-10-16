@@ -16,6 +16,9 @@ typedef struct {
 	int X, Y, Width, Height;
 } Rect;
 
+Size Get_wxDefaultSize();
+Point Get_wxDefaultPosition();
+
 
 #ifdef __cplusplus
 }

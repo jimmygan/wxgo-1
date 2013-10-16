@@ -184,6 +184,19 @@ func (t *objectTable) Release(ptr unsafe.Pointer, id uint16) {
 	}
 }
 
+func (t *objectTable) Hold(ptr unsafe.Pointer, id uint16) {
+	t.l.Lock()
+	defer t.l.Unlock()
+	entry := t.lookup(ptr, id)
+	if entry == nil {
+		return
+	}
+	if DebugObjectBind {
+		log.Printf("[B] Hold 0x%x  \t\t%s\n", ptr, entry)
+	}
+	t.entries[ptr].SetHeld(true)
+}
+
 func (t *objectTable) Unhold(ptr unsafe.Pointer, id uint16) {
 	t.l.Lock()
 	defer t.l.Unlock()

@@ -17,4 +17,6 @@ var (
 	DefaultCoord    int   = int(C.wxDefaultCoord)
 	DefaultSize     Size  = Size(C.Get_wxDefaultSize())
 	DefaultPosition Point = Point(C.Get_wxDefaultPosition())
+	//BUG:
+	DefaultRect Rect = Rect{-1, -1, -1, -1}
 )

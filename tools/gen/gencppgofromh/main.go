@@ -26,6 +26,34 @@ var CFuncReturnType2GoTypeConvFormat = map[string]string{
 	"Point*": "wxPoint ptVar = %v;\n\treturn (*(Point*)&ptVar)",
 	"String": "return NewGoString(%v);",
 }
+var CType2GoType = map[string]string{
+	"Size":   "Size",
+	"Rect":   "Rect",
+	"Point":  "Point",
+	"String": "string",
+	"float":  "float32",
+	"long":   "int",
+	"BOOL":   "bool",
+}
+var CType2CGoCallTypeConvFormat = map[string]string{
+	"String":          "cString(&%v)",
+	"BOOL":            "cBool(%v)",
+	"Size*":           "(*C.Size)(%v)",
+	"Point*":          "(*C.Point)(%v)",
+	"Rect*":           "(*C.Rect)(%v)",
+	CType_WxObjectPtr: "%v.wxPtr()",
+}
+var CType2GoReturnTypeConvFormat = map[string]string{
+	"String": "return goString(%v)",
+	"BOOL":   "return goBool(%v)",
+	"Size":   "return Size(%v)",
+	"Point":  "return Point(%v)",
+	"Rect":   "return Rect(%v)",
+	CType_WxObjectPtr: `if obj := NewObjectFromPtr(%v, false); obj != nil {
+		return obj.(%[1]v)
+	}
+	return nil`,
+}
 
 func init() {
 	flag.Parse()
@@ -48,6 +76,9 @@ func main() {
 	defer hFile.Close()
 
 	var cFuncImplBuf bytes.Buffer
+	var goMethodBuf bytes.Buffer
+	var goCtorBuf bytes.Buffer
+	var goInterfaceFuncBuf bytes.Buffer
 
 	hFileScanner := bufio.NewScanner(hFile)
 	var lineNumber = 1
@@ -58,6 +89,13 @@ func main() {
 			continue
 		}
 		cFuncImplBuf.WriteString(genCFuncImpl(f))
+		ctor, mtd, face := genGoMethod(&f)
+		if ctor {
+			goCtorBuf.WriteString(mtd)
+		} else {
+			goMethodBuf.WriteString(mtd)
+			goInterfaceFuncBuf.WriteString("\t" + face + "\n")
+		}
 		lineNumber++
 	}
 	if err = hFileScanner.Err(); err != nil {
@@ -67,7 +105,8 @@ func main() {
 	// Write cpp file
 	hExtLen := len(filepath.Ext(hFilePath))
 	hFileName := filepath.Base(hFilePath)
-	cppFileName := hFileName[:len(hFileName)-hExtLen] + ".cpp"
+	hFileBaseName := hFileName[:len(hFileName)-hExtLen]
+	cppFileName := hFileBaseName + ".cpp"
 	fmt.Printf("Writing %v ...\n", cppFileName)
 	cppFile, err := os.OpenFile(cppFileName, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
 	if err != nil {
@@ -77,8 +116,216 @@ func main() {
 	defer cppFile.Close()
 	if _, err := cppFile.Write(cFuncImplBuf.Bytes()); err != nil {
 		fmt.Fprintf(os.Stderr, "Can't write to file: %v %v\n", cppFileName, err)
+		os.Exit(101)
 	}
 	fmt.Println("Done!")
+	// Write go file
+	goFileName := hFileBaseName + ".go"
+	fmt.Printf("Writing %v ...\n", goFileName)
+	goFile, err := os.OpenFile(goFileName, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0666)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Can't open file to write: %v %v\n", goFileName, err)
+		os.Exit(100)
+	}
+	defer goFile.Close()
+
+	var goBuf bytes.Buffer
+	var typeName = hFileBaseName
+	var interfaceName = strings.ToUpper(typeName[0:1]) + typeName[1:]
+	fmt.Fprintf(&goBuf, `package wx
+
+import (
+	"reflect"
+)
+
+//#include "%s.h"
+import "C"
+
+func init() {
+	mapType("wx%s", reflect.TypeOf(%[1]s{}))
+}
+
+type %[1]s struct {
+	object
+}
+
+%[3]s
+
+type %s interface {
+	Object
+%s
+}
+
+%s
+
+`, typeName, interfaceName, goMethodBuf.String(), interfaceName, goInterfaceFuncBuf.String(), goCtorBuf.String())
+
+	if _, err := goFile.Write(goBuf.Bytes()); err != nil {
+		fmt.Fprintf(os.Stderr, "Can't write to file: %v %v\n", cppFileName, err)
+		os.Exit(101)
+	}
+	fmt.Println("Done!")
+}
+
+func genGoMethod(f *FuncDecl) (ctor bool, method, interfaceFunc string) {
+	tf := strings.Split(f.Name, "_")
+	wxType := tf[0]
+	interfaceName := wxType[2:]
+	typeName := strings.ToLower(interfaceName[0:1]) + interfaceName[1:] // Lower case the first letter.
+	methodName := tf[1]
+	if strings.HasPrefix(methodName, "Get") {
+		methodName = methodName[3:] // Trim off "Get"
+	}
+	var returnType string
+	var params []*Param = f.Params
+	if strings.HasSuffix(f.Name, "_New") {
+		ctor = true
+		methodName = "New" + interfaceName
+		returnType = interfaceName
+	} else {
+		returnType = getGoMethodReturnType(f.ReturnType)
+		params = params[1:]
+	}
+	interfaceFunc = fmt.Sprintf("%v(%v)%v", methodName, genGoMethodDeclParams(params), returnType)
+	receiver := typeName[0:1]
+	if !ctor { // Do not generate a method for ctor.
+		method = fmt.Sprintf(`func (%v *%v) %v {
+	p := wxPtr(%v)
+	if p == nil {
+		return %v
+	}
+	%v
+}
+`, receiver, typeName, interfaceFunc, receiver, getGoDefReturnValue(returnType), genGoMethodCGoCall(f.ReturnType, f.Name, params))
+	} else {
+		method = fmt.Sprintf(`func New_%v(%v) %v {
+	%v := &%v{}
+	%[4]v.bindWxPtr(C.%[6]v(%v), true)
+	return %[4]v
+}
+`, interfaceName, genGoMethodDeclParams(params), interfaceName, receiver, typeName, f.Name, genCGoCallParams(f.Params, false))
+	}
+	return
+}
+
+func genGoMethodCGoCall(creturnType string, funcName string, params []*Param) string {
+	expr := genCGoCallExpr(funcName, params)
+	if creturnType == "void" {
+		return expr
+	} else {
+		format := CType2GoReturnTypeConvFormat[creturnType]
+		if format == "" {
+			format = "%v"
+		}
+		return fmt.Sprintf(format, expr)
+	}
+}
+
+func genCGoCallExpr(funcName string, params []*Param) string {
+	return fmt.Sprintf("C.%v(%v)", funcName, genCGoCallParams(params, true))
+}
+
+// includeP Whether add "p" as the first parameter to cgo call. Set it to false
+// to generate a ctor(NewXXX()XXX{}).
+func genCGoCallParams(params []*Param, includeP bool) string {
+	var ps []string
+	if includeP {
+		ps = append(ps, "p")
+	}
+	for _, p := range params {
+		ps = append(ps, genCGoCallParam(p))
+	}
+	return strings.Join(ps, ", ")
+}
+
+func genCGoCallParam(param *Param) string {
+	var format = CType2CGoCallTypeConvFormat[param.Type]
+	if format == "" {
+		format = fmt.Sprintf("C.%v(%%v)", param.Type)
+	}
+	return fmt.Sprintf(format, param.Name)
+}
+
+func getGoDefReturnValue(typeName string) string {
+	switch typeName {
+	case "":
+		return ""
+	case "int":
+		return "0"
+	case "bool":
+		return "false"
+	case "string":
+		return `""`
+	case "Size":
+		return "DefaultSize"
+	case "Point":
+		return "DefaultPosition"
+	case "Rect":
+		return "DefaultRect"
+	default:
+		return "nil"
+	}
+}
+
+func cTypeToGoType(ctype string) string {
+	var ptr bool
+	var baseType string = ctype
+	if strings.HasSuffix(ctype, "*") {
+		ptr = true
+		baseType = ctype[:len(ctype)-1]
+	}
+	t := CType2GoType[baseType]
+	if t == "" {
+		return ""
+	} else {
+		if ptr {
+			return "*" + t
+		}
+		return t
+	}
+}
+
+func getGoMethodReturnType(returnType string) string {
+	if returnType == "void" {
+		return ""
+	}
+	goType := cTypeToGoType(returnType)
+	if goType == "" {
+		if strings.HasSuffix(returnType, "*") { // Pointer type
+			goType = "*" + returnType[:len(returnType)-1]
+		} else if goType == CType_WxObjectPtr {
+			goType = "Object"
+		} else {
+			goType = returnType
+		}
+	}
+	return goType
+}
+
+func getGoMethodDeclParam(param *Param) string {
+	goType := cTypeToGoType(param.Type)
+	if goType == "" {
+		switch param.Type {
+		case "WxObjectPtr":
+			goType = strings.ToUpper(param.Name[0:1]) + param.Name[1:]
+		default:
+			if strings.HasSuffix(param.Type, "*") { // Pointer type
+				goType = "*" + param.Type[:len(param.Type)-1]
+			}
+		}
+	}
+	if goType == "" {
+		goType = param.Type
+	}
+	return param.Name + " " + goType
+}
+
+func genGoMethodDeclParams(params []*Param) string {
+	var declParams []string
+	for _, p := range params {
+		declParams = append(declParams, getGoMethodDeclParam(p))
+	}
+	return strings.Join(declParams, ", ")
 }
 
 // ""(wxWindow*)param"
